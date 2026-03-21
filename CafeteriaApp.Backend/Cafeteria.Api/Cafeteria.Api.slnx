@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Cafeteria.Api/Cafeteria.Api.csproj" />
+  <Project Path="Cafeteria.Data/Cafeteria.Data.csproj" />
+  <Project Path="Cafeteria.Models/Cafeteria.Models.csproj" />
+  <Project Path="Cafeteria.Services/Cafeteria.Services.csproj" />
+</Solution>

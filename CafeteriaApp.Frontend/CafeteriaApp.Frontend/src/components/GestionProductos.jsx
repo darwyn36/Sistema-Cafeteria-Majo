@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Card, Form, Input, InputNumber, Button, Select, 
-  Divider, Space, Typography, Upload, List, message, Row, Col, theme // 1. Importar theme
+  Divider, Space, Typography, Upload, List, message, Row, Col, theme
 } from 'antd';
 import { 
   PlusOutlined, 
@@ -16,10 +16,10 @@ import Swal from 'sweetalert2';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
-const { useToken } = theme; // 2. Extraer hook de tokens
+const { useToken } = theme;
 
 export default function GestionProductos() {
-  const { token } = useToken(); // 3. Obtener el colorPrimary dinámico
+  const { token } = useToken();
   const [formInsumo] = Form.useForm();
   const [formProducto] = Form.useForm();
   const [insumosBD, setInsumosBD] = useState([]);
@@ -104,7 +104,7 @@ export default function GestionProductos() {
     <div style={{ padding: 'clamp(10px, 3vw, 30px)', background: '#fdfaf6', minHeight: '100vh' }}>
       <Row gutter={[24, 24]} justify="center">
         
-        {/* SECCIÓN 1: INSUMOS */}
+        {/*INSUMOS */}
         <Col xs={24} lg={10}>
           <Card 
             title={<Text strong style={{ color: token.colorPrimary }}><DatabaseOutlined /> 1. Materia Prima</Text>} 

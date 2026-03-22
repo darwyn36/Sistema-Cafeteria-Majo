@@ -1,6 +1,5 @@
 import React from 'react';
 
-// Usamos forwardRef para que react-to-print pueda acceder al elemento DOM
 export const TicketImprimible = React.forwardRef(({ venta }, ref) => {
   if (!venta) return null;
 

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Card, Form, Input, InputNumber, Button, Select, 
-  Divider, Space, Typography, Upload, List, message, Row, Col 
+  Divider, Space, Typography, Upload, List, message, Row, Col, theme
 } from 'antd';
 import { 
   PlusOutlined, 
@@ -16,12 +16,14 @@ import Swal from 'sweetalert2';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
+const { useToken } = theme;
 
 export default function GestionProductos() {
+  const { token } = useToken();
   const [formInsumo] = Form.useForm();
   const [formProducto] = Form.useForm();
   const [insumosBD, setInsumosBD] = useState([]);
-  const [receta, setReceta] = useState([]); // [{ insumoId, cantidadRequerida, nombre, unidad }]
+  const [receta, setReceta] = useState([]); 
   const [archivo, setArchivo] = useState(null);
   const [cargando, setCargando] = useState(false);
 
@@ -38,11 +40,10 @@ export default function GestionProductos() {
     }
   };
 
-  // --- GUARDAR NUEVO INSUMO ---
   const onFinishInsumo = async (values) => {
     try {
       await api.post('/insumos', values);
-      message.success(`Insumo "${values.nombre}" registrado`);
+      message.success(`Insumo registrado`);
       formInsumo.resetFields();
       cargarInsumos();
     } catch (error) {
@@ -50,13 +51,11 @@ export default function GestionProductos() {
     }
   };
 
-  // --- GESTIÓN DE RECETA ---
   const agregarALaReceta = (id) => {
     if (!id) return;
     if (receta.find(r => r.insumoId === id)) {
-      return message.warning("Este insumo ya está en la receta");
+      return message.warning("Ya está en la receta");
     }
-    
     const insumo = insumosBD.find(i => i.id === id);
     setReceta([...receta, { 
       insumoId: id, 
@@ -76,49 +75,45 @@ export default function GestionProductos() {
     setReceta(receta.filter(r => r.insumoId !== id));
   };
 
-  // --- GUARDAR PRODUCTO FINAL ---
   const onFinishProducto = async (values) => {
-    if (!archivo) return message.error("Por favor, sube una imagen del producto");
-    if (receta.length === 0) return message.warning("La receta no puede estar vacía");
+    if (!archivo) return message.error("Sube una imagen");
+    if (receta.length === 0) return message.warning("Receta vacía");
 
     setCargando(true);
     const formData = new FormData();
     formData.append('nombre', values.nombre);
     formData.append('precio', values.precio);
     formData.append('file', archivo);
-    
     const recetaLimpia = receta.map(({insumoId, cantidadRequerida}) => ({insumoId, cantidadRequerida}));
     formData.append('ingredientesJson', JSON.stringify(recetaLimpia));
 
     try {
-      await api.post('/productos/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      Swal.fire('¡Creado!', 'Producto añadido al menú correctamente', 'success');
+      await api.post('/productos/upload', formData);
+      Swal.fire('¡Éxito!', 'Producto creado', 'success');
       formProducto.resetFields();
       setReceta([]);
       setArchivo(null);
     } catch (error) {
-      message.error("Error al subir el producto");
+      message.error("Error al subir");
     } finally {
       setCargando(false);
     }
   };
 
   return (
-    <div style={{ padding: '30px', background: '#fdfaf6', minHeight: '100vh' }}>
+    <div style={{ padding: 'clamp(10px, 3vw, 30px)', background: '#fdfaf6', minHeight: '100vh' }}>
       <Row gutter={[24, 24]} justify="center">
         
-        {/* SECCIÓN 1: INSUMOS */}
+        {/*INSUMOS */}
         <Col xs={24} lg={10}>
           <Card 
-            title={<><DatabaseOutlined /> 1. Registrar Materia Prima</>} 
+            title={<Text strong style={{ color: token.colorPrimary }}><DatabaseOutlined /> 1. Materia Prima</Text>} 
             bordered={false} 
             style={{ borderRadius: '15px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
           >
             <Form form={formInsumo} layout="vertical" onFinish={onFinishInsumo}>
-              <Form.Item name="nombre" label="Nombre del Insumo" rules={[{ required: true }]}>
-                <Input placeholder="Ej: Café en grano, Leche Entera" />
+              <Form.Item name="nombre" label="Nombre" rules={[{ required: true }]}>
+                <Input placeholder="Ej: Café en grano" />
               </Form.Item>
               
               <Row gutter={16}>
@@ -138,11 +133,18 @@ export default function GestionProductos() {
                 </Col>
               </Row>
 
-              <Form.Item name="stockMinimo" label="Stock de Alerta (Mínimo)" rules={[{ required: true }]}>
+              <Form.Item name="stockMinimo" label="Alerta de Stock Mínimo" rules={[{ required: true }]}>
                 <InputNumber style={{ width: '100%' }} min={0} />
               </Form.Item>
 
-              <Button type="primary" htmlType="submit" block icon={<PlusOutlined />} style={{ background: '#27ae60', borderColor: '#27ae60' }}>
+              {/* Botón usa el color dinámico */}
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                block 
+                icon={<PlusOutlined />} 
+                style={{ backgroundColor: token.colorPrimary, borderColor: token.colorPrimary }}
+              >
                 Registrar en Almacén
               </Button>
             </Form>
@@ -152,20 +154,20 @@ export default function GestionProductos() {
         {/* SECCIÓN 2: PRODUCTOS */}
         <Col xs={24} lg={12}>
           <Card 
-            title={<><CoffeeOutlined /> 2. Crear Producto para el Menú</>} 
+            title={<Text strong style={{ color: token.colorPrimary }}><CoffeeOutlined /> 2. Producto del Menú</Text>} 
             bordered={false} 
             style={{ borderRadius: '15px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
           >
             <Form form={formProducto} layout="vertical" onFinish={onFinishProducto}>
               <Row gutter={16}>
                 <Col span={14}>
-                  <Form.Item name="nombre" label="Nombre del Café/Platillo" rules={[{ required: true }]}>
-                    <Input placeholder="Ej: Cappuccino Vainilla" />
+                  <Form.Item name="nombre" label="Nombre" rules={[{ required: true }]}>
+                    <Input placeholder="Ej: Cappuccino" />
                   </Form.Item>
                 </Col>
                 <Col span={10}>
-                  <Form.Item name="precio" label="Precio Venta" rules={[{ required: true }]}>
-                    <InputNumber style={{ width: '100%' }} prefix="$" min={0} />
+                  <Form.Item name="precio" label="Precio" rules={[{ required: true }]}>
+                    <InputNumber style={{ width: '100%' }} prefix="Bs" min={0} />
                   </Form.Item>
                 </Col>
               </Row>
@@ -176,19 +178,18 @@ export default function GestionProductos() {
                   beforeUpload={(file) => { setArchivo(file); return false; }}
                   onRemove={() => setArchivo(null)}
                 >
-                  <p className="ant-upload-drag-icon"><InboxOutlined /></p>
-                  <p className="ant-upload-text">Haz clic o arrastra la imagen aquí</p>
+                  <p className="ant-upload-drag-icon"><InboxOutlined style={{ color: token.colorPrimary }} /></p>
+                  <p className="ant-upload-text">Arrastra la imagen aquí</p>
                 </Upload.Dragger>
               </Form.Item>
 
-              <Divider orientation="left">Receta (Ingredientes)</Divider>
+              <Divider orientation="left">Receta</Divider>
               
               <Select 
                 showSearch 
-                placeholder="Seleccionar insumo para añadir..." 
+                placeholder="Añadir insumo..." 
                 style={{ width: '100%', marginBottom: '15px' }}
                 onChange={agregarALaReceta}
-                optionFilterProp="children"
                 value={null}
               >
                 {insumosBD.map(i => (
@@ -206,21 +207,20 @@ export default function GestionProductos() {
                       <Button danger type="text" icon={<DeleteOutlined />} onClick={() => quitarDeReceta(item.insumoId)} />
                     ]}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
+                    <Space>
                       <Text strong>{item.nombre}</Text>
-                      <Space>
-                        <InputNumber 
-                          size="small" 
-                          placeholder="Cant." 
-                          onChange={(val) => actualizarCantidadReceta(item.insumoId, val)} 
-                        />
-                        <Text type="secondary">{item.unidad}</Text>
-                      </Space>
-                    </div>
+                      <InputNumber 
+                        size="small" 
+                        placeholder="Cant." 
+                        onChange={(val) => actualizarCantidadReceta(item.insumoId, val)} 
+                      />
+                      <Text type="secondary">{item.unidad}</Text>
+                    </Space>
                   </List.Item>
                 )}
               />
 
+              {/* Botón usa el color dinámico */}
               <Button 
                 type="primary" 
                 htmlType="submit" 
@@ -228,7 +228,7 @@ export default function GestionProductos() {
                 size="large" 
                 loading={cargando}
                 icon={<SaveOutlined />}
-                style={{ background: '#6f4e37', borderColor: '#6f4e37' }}
+                style={{ backgroundColor: token.colorPrimary, borderColor: token.colorPrimary }}
               >
                 Guardar Producto Final
               </Button>

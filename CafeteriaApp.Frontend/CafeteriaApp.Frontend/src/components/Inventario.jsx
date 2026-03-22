@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Table, Tag, Button, Typography, Space, 
-  Card, InputNumber, Modal, message, Tooltip, Empty, theme // Importamos theme
+  Card, InputNumber, Modal, message, Tooltip, Empty, theme
 } from 'antd';
 import { 
   ReloadOutlined, 
@@ -14,10 +14,10 @@ import {
 import api from '../api/api';
 
 const { Title, Text } = Typography;
-const { useToken } = theme; // Hook para extraer los colores del tema actual
+const { useToken } = theme;
 
 export default function Inventario() {
-  const { token } = useToken(); // Obtenemos el token (colorPrimary, etc.)
+  const { token } = useToken();
   const [insumos, setInsumos] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -42,7 +42,7 @@ export default function Inventario() {
     let cantidadASumar = 0;
     Modal.confirm({
       title: `Surtir ${record.nombre}`,
-      icon: <PlusOutlined style={{ color: token.colorPrimary }} />, // Color dinámico
+      icon: <PlusOutlined style={{ color: token.colorPrimary }} />,
       content: (
         <div style={{ marginTop: '15px' }}>
           <Text>¿Cuántas unidades/gramos llegaron?</Text>
@@ -56,7 +56,7 @@ export default function Inventario() {
         </div>
       ),
       okText: 'Sumar al Stock',
-      okButtonProps: { style: { background: token.colorPrimary, borderColor: token.colorPrimary } }, // Color dinámico
+      okButtonProps: { style: { background: token.colorPrimary, borderColor: token.colorPrimary } },
       cancelText: 'Cancelar',
       onOk: async () => {
         if (!cantidadASumar || cantidadASumar <= 0) {
@@ -145,13 +145,13 @@ export default function Inventario() {
             size="small"
             icon={<PlusOutlined />} 
             onClick={() => handleSurtir(record)}
-            style={{ background: token.colorPrimary, borderColor: token.colorPrimary }} // Aplicando el tema
+            style={{ background: token.colorPrimary, borderColor: token.colorPrimary }}
           >
             Surtir
           </Button>
           <Button 
             danger 
-            type="text" // Cambiado a text para que se vea más limpio con los temas
+            type="text"
             size="small"
             icon={<DeleteOutlined />} 
             onClick={() => handleEliminar(record.id)} 

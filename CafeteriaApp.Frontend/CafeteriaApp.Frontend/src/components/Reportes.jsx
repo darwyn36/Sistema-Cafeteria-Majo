@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { 
   Table, Card, Row, Col, Typography, 
-  Statistic, Button, Space, Tag, Spin, message, theme // Importamos theme
+  Statistic, Button, Space, Tag, Spin, message, theme
 } from 'antd';
 import { 
   BarChartOutlined, 
@@ -128,8 +128,6 @@ export default function Reportes() {
       <Title level={2} style={{ color: token.colorPrimary, marginBottom: '25px', fontSize: 'clamp(1.2rem, 5vw, 1.8rem)' }}>
         <BarChartOutlined /> Reportes de Venta
       </Title>
-
-      {/* TARJETAS DE ESTADÍSTICAS RESPONSIVAS CON THEME */}
       <Row gutter={[16, 16]} style={{ marginBottom: '30px' }}>
         <Col xs={24} sm={12} lg={8}>
           <Card bordered={false} style={{ borderLeft: `5px solid ${token.colorSuccess}`, borderRadius: '8px' }}>
